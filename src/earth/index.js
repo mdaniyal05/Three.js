@@ -8,7 +8,10 @@ const h = window.innerHeight;
 const detail = 12;
 const color = 0xffffff;
 const intensity = 500;
+const ringRadius = 10;
 const objects = [];
+let angle = 0;
+const orbitSpeed = 0.01;
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, w / h, 0.1, 1000);
@@ -51,10 +54,10 @@ const lightsMesh = new THREE.Mesh(geometry, lightsMat);
 const cloudsMesh = new THREE.Mesh(geometry, cloudsMat);
 const glowMesh = new THREE.Mesh(geometry, fresnelMat);
 
-earthMesh.position.x = 10;
-lightsMesh.position.x = 10;
-cloudsMesh.position.x = 10;
-glowMesh.position.x = 10;
+// earthMesh.position.x = 10;
+// lightsMesh.position.x = 10;
+// cloudsMesh.position.x = 10;
+// glowMesh.position.x = 10;
 
 const stars = getStarfield({ numStars: 5000 });
 
@@ -94,7 +97,13 @@ new OrbitControls(camera, renderer.domElement);
 function animate() {
   requestAnimationFrame(animate);
 
+  angle += orbitSpeed;
+
+  earthGroup.position.x = ringRadius * Math.cos(angle);
+  earthGroup.position.z = ringRadius * Math.sin(angle);
+
   earthMesh.rotation.y += 0.002;
+  sunMesh.rotation.y += 0.002;
   lightsMesh.rotation.y += 0.002;
   cloudsMesh.rotation.y += 0.0023;
   glowMesh.rotation.y += 0.002;
