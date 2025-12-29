@@ -6,6 +6,9 @@ import { getFresnelMat } from "./getFresnelMat.js";
 const w = window.innerWidth;
 const h = window.innerHeight;
 const detail = 12;
+const color = 0xffffff;
+const intensity = 500;
+const objects = [];
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, w / h, 0.1, 1000);
@@ -21,6 +24,10 @@ const earthMat = new THREE.MeshPhongMaterial({
   specularMap: loader.load("./textures/02_earthspec1k.jpg"),
   bumpMap: loader.load("./textures/01_earthbump1k.jpg"),
   bumpScale: 0.04,
+});
+
+const sunMat = new THREE.MeshPhongMaterial({
+  emissive: 0xffff00,
 });
 
 const lightsMat = new THREE.MeshBasicMaterial({
@@ -39,17 +46,25 @@ const cloudsMat = new THREE.MeshStandardMaterial({
 const fresnelMat = getFresnelMat();
 
 const earthMesh = new THREE.Mesh(geometry, earthMat);
+const sunMesh = new THREE.Mesh(geometry, sunMat);
 const lightsMesh = new THREE.Mesh(geometry, lightsMat);
 const cloudsMesh = new THREE.Mesh(geometry, cloudsMat);
 const glowMesh = new THREE.Mesh(geometry, fresnelMat);
 
+earthMesh.position.x = 10;
+lightsMesh.position.x = 10;
+cloudsMesh.position.x = 10;
+glowMesh.position.x = 10;
+
 const stars = getStarfield({ numStars: 5000 });
 
-const sunLight = new THREE.DirectionalLight(0xffffff, 2.0);
-sunLight.position.set(-2, 0.5, 1.5);
+// const sunLight = new THREE.DirectionalLight(0xffffff, 2.0);
+// sunLight.position.set(-2, 0.5, 1.5);
+const light = new THREE.PointLight(color, intensity);
 
 cloudsMesh.scale.setScalar(1.003);
 glowMesh.scale.setScalar(1.01);
+sunMesh.scale.set(5, 5, 5);
 
 earthGroup.rotation.z = (-23.4 * Math.PI) / 180;
 earthGroup.add(earthMesh);
@@ -58,10 +73,16 @@ earthGroup.add(cloudsMesh);
 earthGroup.add(glowMesh);
 
 scene.add(earthGroup);
+scene.add(sunMesh);
 scene.add(stars);
-scene.add(sunLight);
+scene.add(light);
+// scene.add(sunLight);
 
-camera.position.z = 10;
+objects.push(sunMesh);
+
+camera.position.set(0, 25, 0);
+camera.up.set(0, 0, 1);
+camera.lookAt(0, 0, 0);
 
 renderer.setSize(w, h);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
